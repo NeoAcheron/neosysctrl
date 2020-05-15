@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HidSharp" Version="2.1.0" />
+    <PackageReference Include="Utf8Json" Version="1.3.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeviceSupport\Corsair\NeoAcheron.SystemMonitor.Corsair.csproj" />
+    <ProjectReference Include="..\DeviceSupport\NZXT\NeoAcheron.SystemMonitor.NZXT.csproj" />
+    <ProjectReference Include="..\NeoAcheron.SystemMonitor.Core\NeoAcheron.SystemMonitor.Core.csproj" />
+  </ItemGroup>
+
+</Project>

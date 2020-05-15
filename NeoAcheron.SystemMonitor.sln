@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Console", "NeoAcheron.SystemMonitor.Console\NeoAcheron.SystemMonitor.Console.csproj", "{F576B952-7A10-4D14-A266-45F83CAB1055}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2} = {7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}
+		{69A5B4F7-768B-4597-906E-663A1A6F991E} = {69A5B4F7-768B-4597-906E-663A1A6F991E}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Core", "NeoAcheron.SystemMonitor.Core\NeoAcheron.SystemMonitor.Core.csproj", "{E279978B-14E3-45FC-996A-51CDF79244B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdParty", "3rdParty", "{A66AD3E1-D307-40B2-8E2B-C5F707837F03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreHardwareMonitorLib", "3rdparty\LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj", "{9C16E889-59D1-4047-BC16-9F51BC502B9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeviceSupport", "DeviceSupport", "{8A47FE16-879A-4291-B616-058AE722A500}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Corsair", "DeviceSupport\Corsair\NeoAcheron.SystemMonitor.Corsair.csproj", "{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.NZXT", "DeviceSupport\NZXT\NeoAcheron.SystemMonitor.NZXT.csproj", "{69A5B4F7-768B-4597-906E-663A1A6F991E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F576B952-7A10-4D14-A266-45F83CAB1055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F576B952-7A10-4D14-A266-45F83CAB1055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F576B952-7A10-4D14-A266-45F83CAB1055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F576B952-7A10-4D14-A266-45F83CAB1055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E279978B-14E3-45FC-996A-51CDF79244B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E279978B-14E3-45FC-996A-51CDF79244B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E279978B-14E3-45FC-996A-51CDF79244B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E279978B-14E3-45FC-996A-51CDF79244B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C16E889-59D1-4047-BC16-9F51BC502B9D}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{9C16E889-59D1-4047-BC16-9F51BC502B9D}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{9C16E889-59D1-4047-BC16-9F51BC502B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C16E889-59D1-4047-BC16-9F51BC502B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9C16E889-59D1-4047-BC16-9F51BC502B9D} = {A66AD3E1-D307-40B2-8E2B-C5F707837F03}
+		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2} = {8A47FE16-879A-4291-B616-058AE722A500}
+		{69A5B4F7-768B-4597-906E-663A1A6F991E} = {8A47FE16-879A-4291-B616-058AE722A500}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B6CD5121-3217-4611-925A-6A92C62906BA}
+	EndGlobalSection
+EndGlobal
