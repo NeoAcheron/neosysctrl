@@ -6,16 +6,17 @@ namespace NeoAcheron.SystemMonitor.Core
 {
     public class Setting
     {
-        public readonly string SettingName;
+        public readonly string Path;
 
         public dynamic SettingValue => _settingValue;
-        private dynamic _settingValue;
+
+        private dynamic _settingValue = null;
 
         public event EventHandler<Setting> OnChange;
 
-        public Setting(string settingName, dynamic defaults = null)
+        public Setting(string path, dynamic defaults = null)
         {
-            SettingName = settingName;
+            Path = path;
             _settingValue = defaults;
         }
 

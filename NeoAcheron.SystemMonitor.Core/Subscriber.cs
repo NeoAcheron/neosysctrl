@@ -1,5 +1,6 @@
 ﻿using MQTTnet;
 using MQTTnet.Client.Options;
+using MQTTnet.Client.Receiving;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Collections.Generic;
@@ -8,34 +9,42 @@ using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core
 {
-    public class Subscriber
+    public class Subscriber : IMqttApplicationMessageReceivedHandler
     {
-        private readonly IManagedMqttClient mqttClient;
-        private readonly Dictionary<string, Setting> registeredSettings = new Dictionary<string, Setting>();
+        private readonly IApplicationMessageReceiver mqttReceiver;
+        private readonly Dictionary<string, Setting> registeredSettings;
 
-        private readonly string SubscriberName;
-
-        public Subscriber(string subscriberName, IManagedMqttClient mqttClient)
+        public Subscriber(IApplicationMessageReceiver mqttReceiver)
         {
-            this.SubscriberName = subscriberName;
-            this.mqttClient = mqttClient;
-
-            mqttClient.UseApplicationMessageReceivedHandler(this.OnReceive);
+            this.mqttReceiver = mqttReceiver;
+            this.registeredSettings = new Dictionary<string, Setting>();
+            
+            mqttReceiver.ApplicationMessageReceivedHandler = this;
         }
 
-        private void OnReceive(MqttApplicationMessageReceivedEventArgs arg)
+        public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs arg)
         {
-            Setting setting;
-            registeredSettings.TryGetValue(arg.ApplicationMessage.Topic, out setting);
-
-            if (setting != null)
+            if (arg.ClientId == null) return null;
+            return Task.Run(() =>
             {
-                var format = arg.ApplicationMessage.PayloadFormatIndicator.GetValueOrDefault();
+                try
+                {
+                    if (registeredSettings.ContainsKey(arg.ApplicationMessage.Topic))
+                    {
+                        Setting setting = registeredSettings[arg.ApplicationMessage.Topic];
+                        if (setting != null)
+                        {
+                            dynamic data = JsonSerializer.Deserialize<dynamic>(arg.ApplicationMessage.Payload);
+                            setting.UpdateValue(this, data);
+                            arg.ProcessingFailed = false;
+                        }
+                    }
+                }
+                catch (NullReferenceException ex)
+                {
 
-                dynamic data = JsonSerializer.Deserialize<dynamic>(arg.ApplicationMessage.Payload);
-                setting.UpdateValue(this, data);
-            }
-            arg.ProcessingFailed = false;
+                }
+            });
         }
 
         public void Register(ISettable settable)
@@ -44,32 +53,21 @@ namespace NeoAcheron.SystemMonitor.Core
             {
                 foreach (var setting in settable.AllSettings)
                 {
-                    setting.OnChange += settable.SettingUpdate;
-
-                    string topic = $"{SubscriberName}/{settable.Name}/{setting.SettingName}";
-                    registeredSettings.Add(topic, setting);
-
-                    byte[] payload = JsonSerializer.Serialize<object>(setting.SettingValue);
-
-                    var message = new MqttApplicationMessageBuilder()
-                        .WithTopic(topic)
-                        .WithPayload(payload)
-                        .WithExactlyOnceQoS()
-                        .WithRetainFlag()
-                        .Build();
-
-                    mqttClient.PublishAsync(message);
-
-                    mqttClient.SubscribeAsync(topic, MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
-
-                    Console.WriteLine($"Subscribed to {topic} for updates");
+                    registeredSettings.Add(setting.Path, setting);
                 }
             }
+        }
+
+        public void DeregisterAll()
+        {
+            registeredSettings.Clear();
+            mqttReceiver.ApplicationMessageReceivedHandler = null;
         }
 
 
         public void Dispose()
         {
+            DeregisterAll();
         }
     }
 }

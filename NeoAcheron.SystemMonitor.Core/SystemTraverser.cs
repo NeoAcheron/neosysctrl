@@ -3,90 +3,88 @@ using LibreHardwareMonitor.Hardware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Timers;
+using Utf8Json.Internal;
+using System.Threading;
+using System.Security.AccessControl;
+using NeoAcheron.SystemMonitor.Core.Controllers;
+using NeoAcheron.SystemMonitor.Core.Config;
 
 namespace NeoAcheron.SystemMonitor.Core
 {
     public class SystemTraverser : IDisposable, IVisitor, IMeasurable, ISettable
     {
-        public string Name => "System";
-        private Dictionary<Identifier, Measurement> sensors = new Dictionary<Identifier, Measurement>();
-        private Dictionary<Identifier, Setting> controls = new Dictionary<Identifier, Setting>();
+        private Dictionary<ISensor, Measurement> sensors = new Dictionary<ISensor, Measurement>();
+
+        private Dictionary<Setting, IControl> controls = new Dictionary<Setting, IControl>();
 
         public Measurement[] AllMeasurements => sensors.Values.ToArray();
-        public Setting[] AllSettings => controls.Values.ToArray();
+        public Setting[] AllSettings => controls.Keys.ToArray();
 
+        public readonly Computer computer;
+        private readonly Thread thread;
+        private readonly SensorConfig config;
 
-        private readonly Computer computer = new Computer();
-
-        public SystemTraverser()
+        public SystemTraverser(SensorConfig config = null)
         {
-            computer.Open();
+            this.config = config ?? new SensorConfig();
+
+            computer = new Computer();
+            computer.HardwareAdded += HardwareAdded;
+            computer.HardwareRemoved += HardwareRemoved;
+
             computer.IsControllerEnabled = true;
             computer.IsCpuEnabled = true;
             computer.IsGpuEnabled = true;
-            computer.IsMemoryEnabled = true;
+            computer.IsMemoryEnabled = false;
             computer.IsMotherboardEnabled = true;
-            computer.IsStorageEnabled = true;
+            computer.IsStorageEnabled = false;
             computer.IsNetworkEnabled = false;
 
-            computer.Accept(this);
+            computer.Open();
+            computer.Traverse(this);
 
-            System.Timers.Timer timer = new System.Timers.Timer(1000);
-            timer.AutoReset = true;
-            timer.Elapsed += PollStatus;
-            timer.Enabled = true;
+            thread = new Thread(PollStatus);
+            thread.Start();
         }
 
-        private void PollStatus(object sender, ElapsedEventArgs e)
+        private void PollStatus()
         {
-            computer.Accept(this);
+            while (true)
+            {
+                try
+                {
+                    computer.Traverse(this);
+                }
+                catch (Exception ex)
+                {
+                    // Meh   
+                }
+                finally
+                {
+                    Thread.Sleep(1000);
+                }
+            }
         }
 
         public void VisitComputer(IComputer computer)
         {
-            foreach (var hardware in computer.Hardware)
-            {
-                VisitHardware(hardware);
-            }
+            computer.Traverse(this);
         }
 
         public void VisitHardware(IHardware hardware)
         {
             hardware.Update();
-
-            Measurement measurement = GetMeasurement(hardware.Identifier);
-            measurement.UpdateValue(this, hardware.Name);
-
-            if (hardware.HardwareType == HardwareType.Motherboard)
-            {
-                hardware.GetType();
-            }
-
-            foreach (var sensor in hardware.Sensors)
-            {
-                VisitSensor(sensor);
-            }
-            foreach (IHardware subHardware in hardware.SubHardware)
-            {
-                VisitHardware(subHardware);
-            }
+            hardware.Traverse(this);
         }
 
         public void VisitSensor(ISensor sensor)
         {
-
-            Measurement measurement = GetMeasurement(sensor.Identifier);
-            measurement.UpdateValue(this, sensor.Value);
-
-            var control = sensor.Control;
-            if(control != null){
-                Setting setting = GetSetting(sensor.Identifier);
-
+            Measurement measurement;
+            if (sensors.TryGetValue(sensor, out measurement))
+            {
+                measurement.UpdateValue(this, sensor.Value);
             }
-
         }
 
         public void VisitParameter(IParameter parameter) { }
@@ -96,42 +94,85 @@ namespace NeoAcheron.SystemMonitor.Core
             computer.Close();
         }
 
-        private Measurement GetMeasurement(Identifier identifier)
+        private Measurement GetMeasurement(ISensor sensor)
         {
             Measurement measurement;
-            if (sensors.ContainsKey(identifier))
+            bool success = sensors.TryGetValue(sensor, out measurement);
+
+            if (!success)
             {
-                measurement = sensors[identifier];
-            }
-            else
-            {
-                var name = identifier.ToString().Trim('/');
-                measurement = new Measurement(name);
-                sensors.Add(identifier, measurement);
             }
             return measurement;
         }
 
-        private Setting GetSetting(Identifier identifier)
-        {
-            Setting setting;
-            if (controls.ContainsKey(identifier))
-            {
-                setting = controls[identifier];
-            }
-            else
-            {
-                var name = identifier.ToString().Trim('/');
-                setting = new Setting(name);
-                controls.Add(identifier, setting);
-            }
-            return setting;
-        }
-
         public void SettingUpdate(object source, Setting setting)
         {
-            Identifier id = new Identifier("/" + setting.SettingName);
+            if (setting.SettingValue != null)
+            {
+                float value = (float)setting.SettingValue;
+                controls[setting].SetSoftware(value);
+            }
+        }
 
+        private void HardwareRemoved(IHardware hardware)
+        {
+            hardware.SensorAdded -= SensorAdded;
+            hardware.SensorRemoved -= SensorRemoved;
+
+            foreach (var sensor in hardware.Sensors)
+            {
+                SensorRemoved(sensor);
+            }
+
+            foreach (var subHardware in hardware.SubHardware)
+            {
+                HardwareRemoved(subHardware);
+            }
+        }
+
+        private void HardwareAdded(IHardware hardware)
+        {
+            hardware.SensorAdded += SensorAdded;
+            hardware.SensorRemoved += SensorRemoved;
+
+            foreach (var sensor in hardware.Sensors)
+            {
+                SensorAdded(sensor);
+            }
+
+            foreach (var subHardware in hardware.SubHardware)
+            {
+                HardwareAdded(subHardware);
+            }
+        }
+
+        private void SensorRemoved(ISensor sensor)
+        {
+            if (sensors.ContainsKey(sensor))
+                sensors.Remove(sensor);
+        }
+
+        private void SensorAdded(ISensor sensor)
+        {
+            sensor.ValuesTimeWindow = TimeSpan.Zero;
+
+            var path = sensor.Identifier.ToString().Trim('/');
+            path = path.Replace('#', '$').Replace('+', '_');
+
+            Measurement measurement = new Measurement(path);
+            measurement.Name = config.GetValue($"{path}/name", sensor.Name);
+            sensors.Add(sensor, measurement);
+
+            var control = sensor.Control;
+            if (control != null)
+            {
+                path = control.Identifier.ToString().Trim('/');
+                path = path.Replace('#', '$').Replace('+', '_');
+                Setting setting = new Setting(path);
+
+                controls.Add(setting, control);
+                setting.OnChange += SettingUpdate;
+            }
         }
     }
 }

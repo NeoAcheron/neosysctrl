@@ -1,0 +1,67 @@
+{
+  "Adjusters": [
+    {
+      "lowerValue": 35,
+      "upperValue": 63,
+      "lowerTarget": 0,
+      "upperTarget": 100,
+      "measurementPath": "nzxt/krakenx3/1A/temperature/0",
+      "settingPath": "lpc/it8688e/control/0/control",
+      "watchedMeasurementPaths": [
+        "nzxt/krakenx3/1A/temperature/0"
+      ],
+      "controlledSettingPaths": [
+        "lpc/it8688e/control/0/control"
+      ],
+      "type": "LinearAdjuster"
+    },
+    {
+      "lowerValue": 40,
+      "upperValue": 75,
+      "lowerTarget": 0,
+      "upperTarget": 100,
+      "measurementPath": "gpu/0/temperature/0",
+      "settingPath": "lpc/it8688e/control/2/control",
+      "watchedMeasurementPaths": [
+        "gpu/0/temperature/0"
+      ],
+      "controlledSettingPaths": [
+        "lpc/it8688e/control/2/control"
+      ],
+      "type": "LinearAdjuster"
+    },
+    {
+      "lowerValue": 60,
+      "upperValue": 100,
+      "lowerTarget": 20,
+      "upperTarget": 100,
+      "measurementPath": "amdcpu/0/power/0",
+      "settingPath": "nzxt/krakenx3/1A/control/0/control",
+      "watchedMeasurementPaths": [
+        "amdcpu/0/power/0"
+      ],
+      "controlledSettingPaths": [
+        "nzxt/krakenx3/1A/control/0/control"
+      ],
+      "type": "LinearAdjuster"
+    },
+    {
+      "fixedTarget": 0,
+      "settingPath": "lpc/it8688e/control/1/control",
+      "watchedMeasurementPaths": [],
+      "controlledSettingPaths": [
+        "lpc/it8688e/control/1/control"
+      ],
+      "type": "FixedAdjuster"
+    },
+    {
+      "fixedTarget": 40,
+      "settingPath": "lpc/it8688e/control/3/control",
+      "watchedMeasurementPaths": [],
+      "controlledSettingPaths": [
+        "lpc/it8688e/control/3/control"
+      ],
+      "type": "FixedAdjuster"
+    }
+  ]
+}

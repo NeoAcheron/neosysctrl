@@ -6,7 +6,6 @@ namespace NeoAcheron.SystemMonitor.Core
 {
     public interface ISettable
     {
-        string Name { get; }
         Setting[] AllSettings { get; }
 
         void SettingUpdate(object source, Setting setting);

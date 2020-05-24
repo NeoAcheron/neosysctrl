@@ -6,7 +6,6 @@ namespace NeoAcheron.SystemMonitor.Core
 {
     public interface IMeasurable
     {
-        string Name { get; }
         Measurement[] AllMeasurements { get; }
     }
 }

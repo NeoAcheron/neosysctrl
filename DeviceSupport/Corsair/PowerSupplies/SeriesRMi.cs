@@ -136,19 +136,9 @@ namespace NeoAcheron.SystemMonitor.Corsair.PowerSupplies
             }
         }
 
-        double get_float_data(byte[] data)
+        private object get_float_data(byte[] data)
         {
-            int input_val = ((data[4] << 8) | data[3]);
-
-            int num1 = input_val >> 11;
-            int num2 = input_val & 2047;
-            if (num1 > 15)
-                num1 = -(32 - num1);
-            if (num2 > 1023)
-                num2 = -(2048 - num2);
-            if ((num2 & 1) == 1)
-                ++num2;
-            return num2 * Math.Pow(2.0, num1);
+            throw new NotImplementedException();
         }
     }
 }

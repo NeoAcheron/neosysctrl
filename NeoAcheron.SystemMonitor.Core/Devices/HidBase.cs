@@ -12,10 +12,6 @@ namespace NeoAcheron.SystemMonitor.Core
         protected int VendorId { get; private set; }
         protected int ProductId { get; private set; }
 
-        protected readonly Measurement DeviceManufacturer = new Measurement("Manufacturer");
-        protected readonly Measurement DeviceProductName = new Measurement("ProductName");
-        protected readonly Measurement DeviceSerialNumber = new Measurement("SerialNumber");
-
         private HidDevice _hidDevice;
         private HidStream _hidStream;
 
