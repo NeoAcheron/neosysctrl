@@ -1,0 +1,147 @@
+/* You can add global styles to this file, and also import other style files
+
+
+
+h1, h2, h3, h4, h5, h6, .close {
+    color: white;
+    font-family: 'Segoe UI Light', 'Arial Light' !important;
+}
+
+.badge {
+    color: #656a80;
+    text-transform: uppercase;
+    font-family: 'Segoe UI Light', 'Arial Light' !important;
+}
+
+.card, .mat-dialog-container {
+    background-color: #23283e;
+    margin: 5px;
+}
+
+.all-upper {
+    text-transform: uppercase;   
+}
+ */
+@import "~@angular/material/theming";
+@import "palette";
+@include mat-core();
+
+$candy-app-primary: mat-palette($mat-blue, A200);
+$candy-app-accent: mat-palette($mat-blue, 500, 700, 900);
+
+// The warn palette is optional (defaults to red).
+$candy-app-warn: mat-palette($mat-red);
+
+$mat-dark-theme-foreground: (
+    base: #656a80,
+    divider: $light-dividers,
+    dividers: $light-dividers,
+    disabled: $light-disabled-text,
+    disabled-button: rgba(white, 0.3),
+    disabled-text: $light-disabled-text,
+    elevation: black,
+    hint-text: $light-disabled-text,
+    secondary-text: $light-secondary-text,
+    icon: white,
+    icons: white,
+    text: white,
+    slider-min: white,
+    slider-off: rgba(white, 0.3),
+    slider-off-active: rgba(white, 0.3),
+);
+
+$mat-dark-theme-background: (
+    status-bar: black,
+    app-bar: map_get($mat-duckegg, 900),
+    background: map_get($mat-gunmetal, A900),
+    hover: rgba(white, 0.04),
+    card: #23283e,
+    dialog: #23283e,
+    disabled-button: rgba(white, 0.12),
+    raised-button: map-get($mat-duckegg, 800),
+    focused-button: $light-focused,
+    selected-button: map_get($mat-duckegg, 900),
+    selected-disabled-button: map_get($mat-duckegg, 800),
+    disabled-button-toggle: black,
+    unselected-chip: map_get($mat-duckegg, 700),
+    disabled-list-option: black,
+    tooltip: map_get($mat-duckegg, 700),
+);
+
+$mat-custom-theme: (
+    primary: $candy-app-primary,
+    accent: $candy-app-accent,
+    warn: $candy-app-warn,
+    is-dark: true,
+    foreground: $mat-dark-theme-foreground,
+    background: $mat-dark-theme-background,
+);
+
+$custom-typography: mat-typography-config(
+    $font-family: "Segoe UI Light",
+);
+
+@include angular-material-typography($custom-typography);
+@include angular-material-theme($mat-custom-theme);
+
+
+body {
+    background-color: #0C0F1B;
+    font-family: "Segoe UI Light", "Arial Light";
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: white;
+}
+
+.sensor-block {
+    padding: 5px;
+}
+
+.sensor-content {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 7px;
+    padding: 5px;
+}
+
+.chart-content {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 7px;
+}
+
+.sensor-name {
+    color: #656a80;
+    text-transform: uppercase;
+    font-size: 10pt;
+    display: block;
+}
+
+.sensor-value {
+    margin: 5px 15px;
+    font-size: 15pt;
+    display: block;
+}
+
+.sensor-value-primary {
+    margin: 5px 15px;
+    font-size: 25pt;
+    display: block;
+}
+
+.sensor-type {
+    font-size: 13pt;
+    text-transform: uppercase;
+}
+
+mat-card {
+    margin-bottom: 24px;
+}
+
+.noscroll-container .mat-dialog-container{
+    overflow-y: hidden !important;
+}

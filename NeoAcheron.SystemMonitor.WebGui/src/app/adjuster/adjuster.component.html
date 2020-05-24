@@ -1,0 +1,36 @@
+<div class="d-flex align-items-stretch flex-column bd-highlight mb-3" style="height: 100%;">
+    <div class="p-2 bd-highlight">
+        <div class="row">
+            <mat-form-field class="col-lg-6">
+                <mat-label>Settings for</mat-label>
+                <input matInput [placeholder]="targetSensor.path" [value]="targetSensor.name" (change)="UpdateSensorName($event.target.value)"/>
+            </mat-form-field>
+            <mat-form-field *ngIf="targetSensor.controlPath" class="col-lg-6">
+                <mat-label>Current Control Method</mat-label>
+                <mat-select [(value)]="adjusterType">
+                    <mat-option value="DefaultAdjuster">System Default</mat-option>
+                    <mat-option value="FixedAdjuster">Fixed</mat-option>
+                    <mat-option value="LinearAdjuster">Linear Control</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <hr />
+        </div>
+    </div>
+    <div class="mb-auto p-2 bd-highlight flex-fill">
+        <ng-container *ngIf="adjusterType === 'FixedAdjuster'">
+            <app-adjuster-fixed [targetSensor]="targetSensor" [adjuster]="adjuster"
+                (valueChange)="SaveAdjuster($event)">
+            </app-adjuster-fixed>
+        </ng-container>
+        <ng-container *ngIf="adjusterType === 'LinearAdjuster'">
+            <app-adjuster-linear [targetSensor]="targetSensor" [adjuster]="adjuster" (valueChange)="SaveAdjuster($event)">
+            </app-adjuster-linear>
+        </ng-container>
+    </div>
+    <div class="p-2 bd-highlight align-bottom">
+        <hr>
+        <button type="button" mat-button [mat-dialog-close]="adjuster" class="btn btn-primary float-right">
+            <mat-icon>close</mat-icon>Close
+        </button>
+    </div>
+</div>

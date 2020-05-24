@@ -1,0 +1,47 @@
+<ng-template #tplHardware let-hardware>
+    <div class="d-flex flex-wrap">
+        <div class="col-lg-3 align-self" *ngFor="let sensorType of hardware.sensorTypes; index as i">
+            <br>
+            <div class="sensor-content">
+                <span class="sensor-type">{{sensorType}}</span>
+                <div class="sensor-block" *ngFor="let sensor of (hardware.sensors[sensorType] | isPrimary)">
+                    <ng-template *ngTemplateOutlet="tplSensor; context: {sensor: sensor}"></ng-template>
+                </div>
+                <div class="sensor-block" *ngFor="let sensor of (hardware.sensors[sensorType] | notPrimary)">
+                    <ng-template *ngTemplateOutlet="tplSensor; context: {sensor: sensor}"></ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tplSensor let-sensor="sensor">
+    <div>
+        <span class="sensor-name" (click)="SetPrimary(sensor, !sensor.primary)">{{sensor.name}}</span>
+        <ng-template *ngTemplateOutlet="tplControl; context: {sensor: sensor}"></ng-template>
+        <span [className]="sensor.primary ? 'sensor-value-primary' : 'sensor-value'">{{sensor.value | number:'1.1-1'}}{{sensor.unit}}</span>        
+    </div>
+</ng-template>
+
+<ng-template #tplControl let-sensor="sensor">
+    <button type="button" mat-icon-button class="btn btn-primary float-right"
+        (click)="ConfigureSensor(sensor)">
+        <mat-icon>edit</mat-icon>
+    </button>
+</ng-template>
+
+<mat-card *ngFor="let hardware of allHardware">
+    <mat-card-header>
+        <h5 mat-card-subtitle>{{hardware.type}}</h5>
+        <h3 mat-card-title>{{hardware.name}}</h3>
+    </mat-card-header>
+    <div *ngFor="let child of hardware.children">
+        <mat-card-header>
+            <h5 mat-card-subtitle>{{child.type}}</h5>
+            <h3 mat-card-title>{{child.name}}</h3>
+        </mat-card-header>
+        <ng-template *ngTemplateOutlet="tplHardware; context: {$implicit: child}"></ng-template>
+    </div>
+    <ng-template *ngTemplateOutlet="tplHardware; context: {$implicit: hardware}"></ng-template>
+</mat-card>
+<br>

@@ -1,0 +1,23 @@
+<div class="row">
+    <mat-form-field class="col-lg-6">
+        <mat-label class="badge">Current setting</mat-label>
+        <mat-select [disabled]="true" [value]="targetSensor.path">
+            <mat-option [value]="targetSensor.path">
+                {{targetSensor.parentName}} -
+                {{targetSensor.type}} -
+                {{targetSensor.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <h1>{{targetSensor.value | number:'1.1-1'}}{{targetSensor.unit}}</h1>
+    </div>
+</div>
+
+<mat-slider min="0" max="100" step="1" tickInterval="10" thumbLabel
+    [value]="fixedTarget"
+    (input)="fixedTarget = +($event.source.value)"
+    (valueChange)="PublishUpdate()" style="width: 100%;" >
+</mat-slider>
