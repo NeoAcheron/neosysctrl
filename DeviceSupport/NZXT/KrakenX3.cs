@@ -12,7 +12,7 @@ using System.Timers;
 
 namespace NeoAcheron.SystemMonitor.NZXT
 {
-    public class NzxtKrakenX3 : HidBase, IMeasurable, ISettable
+    public class KrakenX3 : HidBase, IMeasurable, ISettable
     {
         private static readonly byte[] GET_FIRMWARE_INFO = { 0x10, 0x01 };
         private static readonly byte[] GET_LIGHTING_INFO = { 0x20, 0x03 };
@@ -20,7 +20,7 @@ namespace NeoAcheron.SystemMonitor.NZXT
         private static readonly byte[] INITIALIZE_2 = { 0x70, 0x01 };
         private static readonly byte[][] SET_PUMP_TARGET_MAP = new byte[101][];
 
-        static NzxtKrakenX3()
+        static KrakenX3()
         {
             byte[] set_pump_speed_header = { 0x72, 0x01, 0x00, 0x00 };
 
@@ -58,7 +58,6 @@ namespace NeoAcheron.SystemMonitor.NZXT
         protected override void Start()
         {
             Write(GET_FIRMWARE_INFO);
-            Write(GET_LIGHTING_INFO);
             Write(INITIALIZE_1);
             Write(INITIALIZE_2);
         }
