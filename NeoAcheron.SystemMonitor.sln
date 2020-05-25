@@ -21,11 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.NZXT", "DeviceSupport\NZXT\NeoAcheron.SystemMonitor.NZXT.csproj", "{69A5B4F7-768B-4597-906E-663A1A6F991E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Gigabyte", "DeviceSupport\Gigabyte\NeoAcheron.SystemMonitor.Gigabyte.csproj", "{35321D92-533F-44DF-A001-68BE92E34531}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoAcheron.SystemMonitor.Web", "NeoAcheron.SystemMonitor.Web\NeoAcheron.SystemMonitor.Web.csproj", "{3929EE79-6404-4A13-B59F-19DF37625242}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoAcheron.SystemMonitor.Service", "NeoAcheron.SystemMonitor.Service\NeoAcheron.SystemMonitor.Service.csproj", "{4FE6C30F-7FD4-4688-83FD-3BA5E35AFA52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,18 +49,10 @@ Global
 		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69A5B4F7-768B-4597-906E-663A1A6F991E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35321D92-533F-44DF-A001-68BE92E34531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35321D92-533F-44DF-A001-68BE92E34531}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35321D92-533F-44DF-A001-68BE92E34531}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35321D92-533F-44DF-A001-68BE92E34531}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3929EE79-6404-4A13-B59F-19DF37625242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3929EE79-6404-4A13-B59F-19DF37625242}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3929EE79-6404-4A13-B59F-19DF37625242}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3929EE79-6404-4A13-B59F-19DF37625242}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FE6C30F-7FD4-4688-83FD-3BA5E35AFA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FE6C30F-7FD4-4688-83FD-3BA5E35AFA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FE6C30F-7FD4-4688-83FD-3BA5E35AFA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FE6C30F-7FD4-4688-83FD-3BA5E35AFA52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,7 +61,6 @@ Global
 		{9C16E889-59D1-4047-BC16-9F51BC502B9D} = {A66AD3E1-D307-40B2-8E2B-C5F707837F03}
 		{7D80ED29-2284-4168-8E0C-ADCC2F48B7E2} = {8A47FE16-879A-4291-B616-058AE722A500}
 		{69A5B4F7-768B-4597-906E-663A1A6F991E} = {8A47FE16-879A-4291-B616-058AE722A500}
-		{35321D92-533F-44DF-A001-68BE92E34531} = {8A47FE16-879A-4291-B616-058AE722A500}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B6CD5121-3217-4611-925A-6A92C62906BA}

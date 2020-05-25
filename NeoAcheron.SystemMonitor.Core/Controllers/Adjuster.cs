@@ -35,7 +35,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
 
             Adjuster adjuster = null;
-            using var jsonDocument = JsonDocument.ParseValue(ref reader);
+            var jsonDocument = JsonDocument.ParseValue(ref reader);
             var jsonObject = jsonDocument.RootElement;
             var typeString = jsonObject.GetProperty(namingPolicy.ConvertName("Type")).GetString();
 

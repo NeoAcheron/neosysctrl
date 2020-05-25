@@ -140,7 +140,7 @@ namespace NeoAcheron.SystemMonitor.NZXT
             {
                 byte pwm = (byte)setting.SettingValue;
                 if (pwm == 99) pwm = 100; // For some reason, setting it to 99 doesn't work...
-                pwm = Math.Clamp(pwm, (byte)0, (byte)100);
+                pwm = (pwm < 0 ? (byte)0 : (pwm > 100) ? (byte)100 : pwm);
                 Write(SET_PUMP_TARGET_MAP[pwm]);
             }
             else if (setting == RgbControl)
