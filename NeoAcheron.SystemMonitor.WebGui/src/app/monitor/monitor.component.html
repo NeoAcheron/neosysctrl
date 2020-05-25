@@ -1,34 +1,52 @@
 <ng-template #tplHardware let-hardware>
     <div class="d-flex flex-wrap">
-        <div class="col-lg-3 align-self" *ngFor="let sensorType of hardware.sensorTypes; index as i">
+        <div class="col-lg-3 align-self" *ngFor="let sensorType of hardware.sensorTypes">
             <br>
             <div class="sensor-content">
                 <span class="sensor-type">{{sensorType}}</span>
-                <div class="sensor-block" *ngFor="let sensor of (hardware.sensors[sensorType] | isPrimary)">
+                <div class="sensor-block" *ngFor="let sensor of (hardware.sensors[sensorType] | isPrimary:true | isHidden:false)">
                     <ng-template *ngTemplateOutlet="tplSensor; context: {sensor: sensor}"></ng-template>
                 </div>
-                <div class="sensor-block" *ngFor="let sensor of (hardware.sensors[sensorType] | notPrimary)">
+                <div class="sensor-block"
+                    *ngFor="let sensor of (hardware.sensors[sensorType] | isPrimary:false | isHidden:false)">
                     <ng-template *ngTemplateOutlet="tplSensor; context: {sensor: sensor}"></ng-template>
                 </div>
+                <ng-container *ngIf="showHidden">
+                    <h4 *ngIf="(hardware.sensors[sensorType] | isHidden:true).length > 0">Hidden items</h4>
+                    <div class="sensor-block disabled"
+                        *ngFor="let sensor of (hardware.sensors[sensorType] | isHidden:true)">
+                        <ng-template *ngTemplateOutlet="tplSensor; context: {sensor: sensor}"></ng-template>
+                    </div>
+                </ng-container>
             </div>
         </div>
     </div>
 </ng-template>
 
 <ng-template #tplSensor let-sensor="sensor">
-    <div>
-        <span class="sensor-name" (click)="SetPrimary(sensor, !sensor.primary)">{{sensor.name}}</span>
+    <div class="show-buttons-on-hover">
+        <span class="sensor-name">{{sensor.name}}</span>
         <ng-template *ngTemplateOutlet="tplControl; context: {sensor: sensor}"></ng-template>
-        <span [className]="sensor.primary ? 'sensor-value-primary' : 'sensor-value'">{{sensor.value | number:'1.1-1'}}{{sensor.unit}}</span>        
+        <span
+            [className]="sensor.primary ? 'sensor-value-primary' : 'sensor-value'">{{sensor.value | number:'1.1-1'}}{{sensor.unit}}</span>
     </div>
 </ng-template>
 
 <ng-template #tplControl let-sensor="sensor">
-    <button type="button" mat-icon-button class="btn btn-primary float-right"
-        (click)="ConfigureSensor(sensor)">
+    <button type="button" mat-icon-button class="btn btn-primary float-right" (click)="ConfigureSensor(sensor)">
         <mat-icon>edit</mat-icon>
     </button>
 </ng-template>
+
+<div>
+    <button mat-raised-button [matMenuTriggerFor]="settingsMenu" class="btn">
+        <mat-icon>settings</mat-icon>
+    </button>
+    <mat-menu #settingsMenu="matMenu">
+        <button mat-menu-item *ngIf="!showHidden" (click)="showHidden = true;">Show hidden items</button>
+        <button mat-menu-item *ngIf="showHidden" (click)="showHidden = false;">Hide hidden items</button>
+    </mat-menu>
+</div>
 
 <mat-card *ngFor="let hardware of allHardware">
     <mat-card-header>

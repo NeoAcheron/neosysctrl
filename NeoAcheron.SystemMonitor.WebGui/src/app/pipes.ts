@@ -6,18 +6,18 @@ import { Sensor } from './models/sensor/sensor.service';
   pure: false
 })
 export class MeasurementIsPrimaryPipe implements PipeTransform {
-  transform(allMeasurements: Sensor[]) {
-    return allMeasurements.filter(m => m.primary);
+  transform(allMeasurements: Sensor[], showPrimary?: boolean) {
+    return allMeasurements.filter(m => m.primary == showPrimary);
   }
 }
 
 @Pipe({
-  name: 'notPrimary',
+  name: 'isHidden',
   pure: false
 })
-export class MeasurementNotPrimaryPipe implements PipeTransform {
-  transform(allMeasurements: Sensor[]) {
-    return allMeasurements.filter(m => !m.primary);
+export class MeasurementIsHiddenPipe implements PipeTransform {
+  transform(allMeasurements: Sensor[], showHidden?: boolean) {
+    return allMeasurements.filter(m => m.hidden == showHidden);
   }
 }
 

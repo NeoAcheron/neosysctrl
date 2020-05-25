@@ -31,6 +31,8 @@ export class LinearComponent extends LinearAdjuster implements OnInit, AfterView
   private currentValueAnnotationOptions: any;
   private currentTargetAnnotationOptions: any;
 
+  private loading: boolean = true;
+
   canvas: any;
   ctx: any;
   chart: any;
@@ -95,7 +97,10 @@ export class LinearComponent extends LinearAdjuster implements OnInit, AfterView
       this.updateInterval = undefined;
     }
 
-    if (sensor === undefined) return;
+    if (sensor === undefined) {
+      this.loading = false; 
+      return;
+    }
     this.selectedMeasurementUnit = sensor.unit;
     this.selectedMeasurementValue = sensor.value;
 
@@ -122,9 +127,9 @@ export class LinearComponent extends LinearAdjuster implements OnInit, AfterView
       }
     }.bind(this);
 
-    this.PublishUpdate();
     updateFunction();
     this.updateInterval = setInterval(updateFunction, 500);
+    this.PublishUpdate();
   }
 
   LockLowerValue(): void {
@@ -157,7 +162,9 @@ export class LinearComponent extends LinearAdjuster implements OnInit, AfterView
     adjuster.lowerValue = this.lowerValue;
     adjuster.upperValue = this.upperValue;
 
-    this.valueChange.emit(adjuster);
+    if (!this.loading)
+      this.valueChange.emit(adjuster);
+    this.loading = false;
   }
 
   ngOnDestroy(): void {

@@ -39,6 +39,7 @@ export class Sensor {
   type: string;
   value: number;
   primary: boolean;
+  hidden: boolean;
   unit: string;
   controlPath: string;
   parentName: string;

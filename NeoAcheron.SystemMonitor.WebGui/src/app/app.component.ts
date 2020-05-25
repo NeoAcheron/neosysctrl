@@ -7,7 +7,7 @@ import { MqttService } from './services/mqtt.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'sys-mon';
+  title = 'System Monitor';
 
   constructor(private mqttService: MqttService) {
 

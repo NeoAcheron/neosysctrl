@@ -1,9 +1,10 @@
-import { Component, OnInit, OnChanges, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Adjuster } from '../models';
 import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Sensor } from '../models/sensor/sensor.service';
 import { FormControl, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-adjuster',
@@ -20,9 +21,11 @@ export class AdjusterComponent implements OnInit {
 
   adjusterType: string;
 
+  private displayed: boolean = false;
+
   nameFormControl: FormControl = new FormControl('', Validators.required);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient, private snackBar: MatSnackBar) {
     this.targetSensor = data.targetSensor;
     this.GetAdjuster();
   }
@@ -49,14 +52,35 @@ export class AdjusterComponent implements OnInit {
     this.adjuster = adjuster;
     var url = "http://localhost:5000/api/control/" + this.targetSensor.controlPath;
     this.http.put(url, adjuster).subscribe((response) => {
-      console.log("Success!");
+      this.snackBar.open("Settings saved and applied", "", {
+        duration: 2000,
+      });
+    });
+  }
+
+  UpdateSensor(successMessage: string): void {
+    this.http.put("http://localhost:5000/api/hardware", this.targetSensor).subscribe((data: Sensor) => {
+      this.targetSensor.name = data.name;
+      this.targetSensor.primary = data.primary;
+      this.targetSensor.hidden = data.hidden;
+      this.snackBar.open(successMessage, "", {
+        duration: 2000,
+      });
     });
   }
 
   UpdateSensorName(name: string): void {
     this.targetSensor.name = name;
-    this.http.put("http://localhost:5000/api/hardware", this.targetSensor).subscribe((data: Sensor) => {
-      this.targetSensor.name = data.name;
-    });
+    this.UpdateSensor("Name updated successfully");
+  }
+
+  UpdateSensorPrimary(primary: boolean): void {
+    this.targetSensor.primary = primary;
+    this.UpdateSensor(primary ? "Primary value set" : "Primary value unset");
+  }
+
+  UpdateSensorHidden(hidden: boolean): void {
+    this.targetSensor.hidden = hidden;
+    this.UpdateSensor(hidden ? "Value hidden from summary" : "Value shown in summary");
   }
 }

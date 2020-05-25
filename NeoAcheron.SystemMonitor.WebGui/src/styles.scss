@@ -84,10 +84,9 @@ $custom-typography: mat-typography-config(
 @include angular-material-typography($custom-typography);
 @include angular-material-theme($mat-custom-theme);
 
-
 body {
-    background-color: #0C0F1B;
-    font-family: "Segoe UI Light", "Arial Light";
+    background-color: #0c0f1b;
+    font-family: "Segoe UI Light", "Arial Light" !important;
 }
 
 h1,
@@ -96,6 +95,7 @@ h3,
 h4,
 h5,
 h6 {
+    font-family: "Segoe UI Light", "Arial Light" !important;
     color: white;
 }
 
@@ -139,9 +139,33 @@ h6 {
 }
 
 mat-card {
-    margin-bottom: 24px;
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
-.noscroll-container .mat-dialog-container{
+.align-center {
+    text-align: center;
+}
+
+.noscroll-container .mat-dialog-container {
     overflow-y: hidden !important;
+}
+
+.show-buttons-on-hover > button {
+    opacity: 0;
+}
+
+.show-buttons-on-hover:hover > button {
+    animation: fadeInAnimation ease 0.5s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }

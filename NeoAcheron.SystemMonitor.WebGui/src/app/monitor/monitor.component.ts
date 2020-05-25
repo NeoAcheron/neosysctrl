@@ -21,6 +21,7 @@ import { ScrollStrategyOptions } from '@angular/cdk/overlay';
 export class MonitorComponent implements OnInit {
 
   public allHardware: Hardware[] = [];
+  public showHidden: boolean = false;
 
   constructor(private http: HttpClient, public dialog: MatDialog, public sensorService: SensorService) {
   }
@@ -67,13 +68,6 @@ export class MonitorComponent implements OnInit {
         sensor.parentName = hardware.name;
         this.sensorService.addSensor(sensor);
       });
-    });
-  }
-
-  SetPrimary(sensor, primary): void {
-    sensor.primary = primary;
-    this.http.put("http://localhost:5000/api/hardware", sensor).subscribe((data: Sensor) => {
-      sensor.primary = data.primary;
     });
   }
 

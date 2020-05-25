@@ -1,7 +1,8 @@
 <div class="row">
     <mat-form-field class="col-lg-6">
         <mat-label class="badge">Current setting</mat-label>
-        <mat-select [disabled]="true" [value]="targetSensor.path">
+        <mat-select [disabled]="true" [value]="targetSensor.path"
+            matTooltip="The control that is currently being modified.">
             <mat-option [value]="targetSensor.path">
                 {{targetSensor.parentName}} -
                 {{targetSensor.type}} -
@@ -16,8 +17,10 @@
     </div>
 </div>
 
-<mat-slider min="0" max="100" step="1" tickInterval="10" thumbLabel
-    [value]="fixedTarget"
-    (input)="fixedTarget = +($event.source.value)"
-    (valueChange)="PublishUpdate()" style="width: 100%;" >
+<mat-slider min="0" max="100" step="1" tickInterval="10" thumbLabel [value]="fixedTarget"
+    (input)="fixedTarget = +($event.source.value)" (valueChange)="PublishUpdate()" style="width: 100%;"    
+    matTooltip="The fixed value to set the setting to.">
 </mat-slider>
+<mat-hint>
+    The fixed control will set and hold the setting to a specified value that will not change.
+</mat-hint>

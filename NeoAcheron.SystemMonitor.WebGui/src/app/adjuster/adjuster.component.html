@@ -3,19 +3,33 @@
         <div class="row">
             <mat-form-field class="col-lg-6">
                 <mat-label>Settings for</mat-label>
-                <input matInput [placeholder]="targetSensor.path" [value]="targetSensor.name" (change)="UpdateSensorName($event.target.value)"/>
+                <input matInput [placeholder]="targetSensor.path" [value]="targetSensor.name"
+                    matTooltip="You can type a new name for the control to be used throughout the application."
+                    (change)="UpdateSensorName($event.target.value)" />
             </mat-form-field>
+            <div class="col-lg-6 row">
+                <mat-checkbox class="col-4" [checked]="targetSensor.primary"
+                    matTooltip="Set or unsets the primary status of the measurement. This is purely visual, primary controls will be displayed with a larger font and at the top."
+                    (change)="UpdateSensorPrimary(!targetSensor.primary)">Primary</mat-checkbox>
+                <mat-checkbox class="col-4 float-right" [checked]="targetSensor.hidden"
+                    matTooltip="Hides the control from all views. Hidden controls can be shown temporarily in the global settings menu."
+                    (change)="UpdateSensorHidden(!targetSensor.hidden)">Hidden</mat-checkbox>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-lg-6"></div>
             <mat-form-field *ngIf="targetSensor.controlPath" class="col-lg-6">
                 <mat-label>Current Control Method</mat-label>
-                <mat-select [(value)]="adjusterType">
+                <mat-select [(value)]="adjusterType" matTooltip="Changes the way this control is automated.">
                     <mat-option value="DefaultAdjuster">System Default</mat-option>
                     <mat-option value="FixedAdjuster">Fixed</mat-option>
                     <mat-option value="LinearAdjuster">Linear Control</mat-option>
                 </mat-select>
             </mat-form-field>
-            <hr />
         </div>
     </div>
+    <hr />
     <div class="mb-auto p-2 bd-highlight flex-fill">
         <ng-container *ngIf="adjusterType === 'FixedAdjuster'">
             <app-adjuster-fixed [targetSensor]="targetSensor" [adjuster]="adjuster"
@@ -23,7 +37,8 @@
             </app-adjuster-fixed>
         </ng-container>
         <ng-container *ngIf="adjusterType === 'LinearAdjuster'">
-            <app-adjuster-linear [targetSensor]="targetSensor" [adjuster]="adjuster" (valueChange)="SaveAdjuster($event)">
+            <app-adjuster-linear [targetSensor]="targetSensor" [adjuster]="adjuster"
+                (valueChange)="SaveAdjuster($event)">
             </app-adjuster-linear>
         </ng-container>
     </div>
