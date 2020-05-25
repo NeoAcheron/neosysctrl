@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+NeoAcheron.SystemMonitor.Web/AdjusterConfig.json
+NeoAcheron.SystemMonitor.Web/SensorConfig.json
