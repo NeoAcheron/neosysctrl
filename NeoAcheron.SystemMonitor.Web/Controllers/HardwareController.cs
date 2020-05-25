@@ -9,7 +9,6 @@ using NeoAcheron.SystemMonitor.Core;
 using NeoAcheron.SystemMonitor.Core.Config;
 using NeoAcheron.SystemMonitor.Web.Models;
 using NeoAcheron.SystemMonitor.Web.Utils;
-using Newtonsoft.Json.Schema;
 
 namespace NeoAcheron.SystemMonitor.Web.Controllers
 {
@@ -47,9 +46,9 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
             public void VisitHardware(IHardware hardware)
             {
                 var instance = new HardwareDescriptor();
-                instance.Name = hardware.Name;
                 instance.Type = hardware.HardwareType.ToString();
                 instance.Path = hardware.Identifier.ToString().Trim('/');
+                instance.Name = sensorConfig.GetName(instance.Path, hardware.Name);
 
                 entry.Children.Add(instance);
 
@@ -70,9 +69,9 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
                 var instance = new SensorDescriptor();
                 instance.Type = sensor.SensorType.ToString().ToLower();
                 instance.Path = sensor.Identifier.ToString().Trim('/');
-                instance.Name = sensorConfig.GetValue($"{instance.Path}/name", sensor.Name);
-                instance.Hidden = sensorConfig.GetValue($"{instance.Path}/hidden", false);
-                instance.Primary = sensorConfig.GetValue($"{instance.Path}/primary", false);
+                instance.Name = sensorConfig.GetName(instance.Path, sensor.Name);
+                instance.Hidden = sensorConfig.IsHidden(instance.Path, false);
+                instance.Primary = sensorConfig.IsPrimary(instance.Path, false);
 
                 List<SensorDescriptor> descriptors = entry.Sensors.GetValueOrDefault(instance.Type, new List<SensorDescriptor>());
                 descriptors.Add(instance);
@@ -106,9 +105,9 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
         [HttpPut]
         public SensorDescriptor Put([FromBody]SensorDescriptor sensorDescriptor)
         {
-            sensorConfig.SetValue($"{sensorDescriptor.Path}/primary", sensorDescriptor.Primary);
-            sensorConfig.SetValue($"{sensorDescriptor.Path}/name", sensorDescriptor.Name);
-            sensorConfig.SetValue($"{sensorDescriptor.Path}/hidden", sensorDescriptor.Hidden);
+            sensorConfig.AddOrUpdatePrimary(sensorDescriptor.Path, sensorDescriptor.Primary);
+            sensorConfig.AddOrUpdateName(sensorDescriptor.Path, sensorDescriptor.Name);
+            sensorConfig.AddOrUpdateHidden(sensorDescriptor.Path, sensorDescriptor.Hidden);
             sensorConfig.Save();
 
             return sensorDescriptor;

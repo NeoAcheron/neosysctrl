@@ -10,26 +10,40 @@ namespace NeoAcheron.SystemMonitor.Core.Config
     public class SensorConfig : ConfigurationLoader<SensorConfig>
     {
         public ConcurrentDictionary<string, bool> PrimarySensors { get; set; } = new ConcurrentDictionary<string, bool>();
-        public ConcurrentDictionary<string, object> SensorSettings { get; set; } = new ConcurrentDictionary<string, object>();
+        public ConcurrentDictionary<string, string> SensorNames { get; set; } = new ConcurrentDictionary<string, string>();
+        public ConcurrentDictionary<string, bool> SensorHidden { get; set; } = new ConcurrentDictionary<string, bool>();
+    }
 
-        public bool Contains(string name)
+    public static class SensorConfigHelper
+    {
+        public static void AddOrUpdateName(this SensorConfig config, string path, string name)
         {
-            return SensorSettings.ContainsKey(name);
+            config.SensorNames.AddOrUpdate(path, name, (key, oldval) => { return name; });
         }
 
-        public T GetValue<T>(string name, T value)
+        public static string GetName(this SensorConfig config, string path, string name)
         {
-            return (T)SensorSettings.GetOrAdd(name, value);
+            return config.SensorNames.GetOrAdd(path, name);
         }
 
-        public void Remove(string name)
+        public static void AddOrUpdateHidden(this SensorConfig config, string path, bool hidden)
         {
-            SensorSettings.TryRemove(name, out _);
+            config.SensorHidden.AddOrUpdate(path, hidden, (key, oldval) => { return hidden; });
         }
 
-        public void SetValue(string name, object value)
+        public static bool IsHidden(this SensorConfig config, string path, bool hidden)
         {
-            SensorSettings.AddOrUpdate(name, value, (key, oldval) => { return value; });
+            return config.SensorHidden.GetOrAdd(path, hidden);
+        }
+
+        public static void AddOrUpdatePrimary(this SensorConfig config, string path, bool primary)
+        {
+            config.PrimarySensors.AddOrUpdate(path, primary, (key, oldval) => { return primary; });
+        }
+
+        public static bool IsPrimary(this SensorConfig config, string path, bool primary)
+        {
+            return config.PrimarySensors.GetOrAdd(path, primary);
         }
     }
 }

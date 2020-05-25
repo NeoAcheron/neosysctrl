@@ -160,7 +160,7 @@ namespace NeoAcheron.SystemMonitor.Core
             path = path.Replace('#', '$').Replace('+', '_');
 
             Measurement measurement = new Measurement(path);
-            measurement.Name = config.GetValue($"{path}/name", sensor.Name);
+            measurement.Name = config.GetName(path, sensor.Name);
             sensors.Add(sensor, measurement);
 
             var control = sensor.Control;
