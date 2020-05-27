@@ -7,6 +7,6 @@ namespace NeoAcheron.SystemMonitor.Core.Config
 {
     public class AdjusterConfig : ConfigurationLoader<AdjusterConfig>
     {
-        public List<Adjuster> Adjusters { get; set; } = new List<Adjuster>();
+        public List<IAdjuster> Adjusters { get; set; } = new List<IAdjuster>();
     }
 }

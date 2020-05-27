@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NeoAcheron.SystemMonitor.Core.Config;
 using NeoAcheron.SystemMonitor.Core.Controllers;
@@ -15,7 +12,7 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
     [Route("api/[controller]")]
     public class ControlController : Controller
     {
-        private Dictionary<string, Adjuster> adjusters = new Dictionary<string, Adjuster>();
+        private Dictionary<string, IAdjuster> adjusters = new Dictionary<string, IAdjuster>();
         private readonly Core.SystemTraverser systemTraverser;
         private readonly AdjusterConfig adjusterConfig;
 
@@ -24,7 +21,7 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
             this.systemTraverser = systemTraverser;
             this.adjusterConfig = adjusterConfig;
 
-            foreach (Adjuster adjuster in adjusterConfig.Adjusters)
+            foreach (IAdjuster adjuster in adjusterConfig.Adjusters)
             {
                 if (adjuster.ControlledSettingPaths == null) continue;
                 foreach (string controlPath in adjuster.ControlledSettingPaths)
@@ -67,7 +64,7 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{**controlPath}")]
-        public IActionResult Put([FromRoute]string controlPath, [FromBody]Adjuster adjuster)
+        public IActionResult Put([FromRoute]string controlPath, [FromBody]IAdjuster adjuster)
         {
             if (!systemTraverser.AllSettings.Any(s => s.Path == controlPath)) return NotFound("Control path not found");
 

@@ -62,7 +62,7 @@ namespace NeoAcheron.SystemMonitor.Core
                 }
                 finally
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -83,7 +83,7 @@ namespace NeoAcheron.SystemMonitor.Core
             Measurement measurement;
             if (sensors.TryGetValue(sensor, out measurement))
             {
-                measurement.UpdateValue(this, sensor.Value);
+                measurement.Value = sensor.Value;
             }
         }
 
@@ -105,11 +105,11 @@ namespace NeoAcheron.SystemMonitor.Core
             return measurement;
         }
 
-        public void SettingUpdate(object source, Setting setting)
+        public void SettingUpdate(Setting setting)
         {
-            if (setting.SettingValue != null)
+            if (setting.Value != null)
             {
-                float value = (float)setting.SettingValue;
+                float value = (float)setting.Value;
                 controls[setting].SetSoftware(value);
             }
         }
@@ -160,7 +160,6 @@ namespace NeoAcheron.SystemMonitor.Core
             path = path.Replace('#', '$').Replace('+', '_');
 
             Measurement measurement = new Measurement(path);
-            measurement.Name = config.GetName(path, sensor.Name);
             sensors.Add(sensor, measurement);
 
             var control = sensor.Control;

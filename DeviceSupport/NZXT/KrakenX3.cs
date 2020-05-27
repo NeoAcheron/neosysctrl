@@ -84,7 +84,7 @@ namespace NeoAcheron.SystemMonitor.NZXT
 
         private void UnpackFirmwareInfo(byte[] data)
         {
-            FirmwareVersion.UpdateValue(this, String.Format("{0}.{1}.{2}", data[0x11], data[0x12], data[0x13]));
+            FirmwareVersion.Value = String.Format("{0}.{1}.{2}", data[0x11], data[0x12], data[0x13]);
         }
 
         private void UnpackLightingInfo(byte[] data)
@@ -124,21 +124,21 @@ namespace NeoAcheron.SystemMonitor.NZXT
                 }
             }
 
-            RgbInfo.UpdateValue(this, ledData);
+            RgbInfo.Value = (ledData);
         }
 
         private void UnpackStatusUpdate(byte[] data)
         {
-            LiquidTemperature.UpdateValue(this, data[15] + data[16] / 10.0f);
-            PumpSpeed.UpdateValue(this, (data[18] << 8) | data[17]);
-            PumpTarget.UpdateValue(this, data[19]);
+            LiquidTemperature.Value = (data[15] + data[16] / 10.0f);
+            PumpSpeed.Value = ((data[18] << 8) | data[17]);
+            PumpTarget.Value = (data[19]);
         }
 
-        public void SettingUpdate(object source, Setting setting)
+        public void SettingUpdate(Setting setting)
         {
             if (setting == PumpTargetSetting)
             {
-                byte pwm = (byte)setting.SettingValue;
+                byte pwm = (byte)setting.Value;
                 if (pwm == 99) pwm = 100; // For some reason, setting it to 99 doesn't work...
                 pwm = (pwm < 0 ? (byte)0 : (pwm > 100) ? (byte)100 : pwm);
                 Write(SET_PUMP_TARGET_MAP[pwm]);
@@ -146,7 +146,7 @@ namespace NeoAcheron.SystemMonitor.NZXT
             else if (setting == RgbControl)
             {
 
-                ColorSpace[] value = setting.SettingValue as ColorSpace[];
+                ColorSpace[] value = setting.Value as ColorSpace[];
                 if (value == null) return;
 
                 int i = 0;

@@ -64,6 +64,8 @@ namespace NeoAcheron.SystemMonitor.Web.Utils
                     publisher.DeregisterAll();
                 }
             }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         public async Task HandleClientConnectedAsync(MqttServerClientConnectedEventArgs eventArgs)

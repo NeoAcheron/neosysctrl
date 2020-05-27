@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using MQTTnet.AspNetCore;
 using NeoAcheron.SystemMonitor.Core;
 using NeoAcheron.SystemMonitor.Core.Config;
 using NeoAcheron.SystemMonitor.Core.Controllers;
 using NeoAcheron.SystemMonitor.Web.Utils;
+using Utf8Json;
+using Utf8Json.Resolvers;
 
 namespace NeoAcheron.SystemMonitor.Web
 {
@@ -40,6 +43,7 @@ namespace NeoAcheron.SystemMonitor.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddCors(options =>
                {
                    options.AddPolicy(name: LocalhostOrigins,
@@ -62,14 +66,22 @@ namespace NeoAcheron.SystemMonitor.Web
 
             services
                 .AddConnections()
-                .AddControllers();
+                .AddControllers((options) =>
+                {
+                    options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
+                    options.OutputFormatters.Add(new Utf8JsonOutputFormatter());
 
-            adjusterConfig.Load();
+                    options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
+                    options.InputFormatters.Insert(0, new Utf8JsonInputFormatter());
+                });
+
+
             sensorConfig.Load();
+            adjusterConfig.Load();
 
             systemTraverser = new SystemTraverser(sensorConfig);
 
-            foreach (Adjuster adjuster in adjusterConfig.Adjusters)
+            foreach (IAdjuster adjuster in adjusterConfig.Adjusters)
             {
                 adjuster.Start(systemTraverser);
             }
@@ -95,7 +107,7 @@ namespace NeoAcheron.SystemMonitor.Web
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(env.ContentRootPath + "/wwwroot/"),
+                FileProvider = new PhysicalFileProvider(AppContext.BaseDirectory + "/wwwroot/"),
                 RequestPath = new PathString("")
             });
             app.UseRouting();

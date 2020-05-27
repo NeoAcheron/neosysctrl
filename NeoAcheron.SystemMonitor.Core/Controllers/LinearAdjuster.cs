@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core.Controllers
 {
-    [JsonConverter(typeof(AdjusterConverter))]
-    public class LinearAdjuster : Adjuster
+    public class LinearAdjuster : IAdjuster
     {
         private Measurement _measurement = null;
         private Setting _setting = null;
@@ -20,8 +18,8 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
         public string MeasurementPath { get; set; }
         public string SettingPath { get; set; }
 
-        public override string[] WatchedMeasurementPaths => new string[] { MeasurementPath };
-        public override string[] ControlledSettingPaths => new string[] { SettingPath };
+        public string[] WatchedMeasurementPaths => new string[] { MeasurementPath };
+        public string[] ControlledSettingPaths => new string[] { SettingPath };
 
         public LinearAdjuster()
         {
@@ -33,30 +31,30 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             this.Setting = setting;
         }
 
-        private void Measurement_OnChange(object sender, Measurement e)
+        private void Measurement_OnChange(Measurement e)
         {
             if (e?.Value != null && _setting != null)
             {
                 float value = (float)e.Value;
                 float target = linear(value, LowerValue, UpperValue, LowerTarget, UpperTarget);
 
-                _setting.UpdateValue(this, target);
+                _setting.Value = target;
             }
         }
 
-        public override bool Start(SystemTraverser systemTraverser)
+        public bool Start(SystemTraverser systemTraverser)
         {
             if (String.IsNullOrEmpty(MeasurementPath) || string.IsNullOrEmpty(SettingPath))
                 return false;
 
             Measurement = systemTraverser.AllMeasurements.FirstOrDefault(m => m.Path.Equals(MeasurementPath));
             Setting = systemTraverser.AllSettings.FirstOrDefault(s => s.Path.Equals(SettingPath));
-            Measurement_OnChange(this, Measurement);
+            Measurement_OnChange(Measurement);
 
             return _measurement != null && _setting != null;
         }
 
-        public override bool Stop()
+        public bool Stop()
         {
             Measurement = null;
             Setting = null;
@@ -65,7 +63,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
         }
 
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public Measurement Measurement
         {
             get
@@ -83,7 +81,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
         }
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public Setting Setting
         {
             get
@@ -97,6 +95,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
         }
 
+        public string Type { get; set; }
 
         static public float linear(float x, float x0, float x1, float y0, float y1)
         {

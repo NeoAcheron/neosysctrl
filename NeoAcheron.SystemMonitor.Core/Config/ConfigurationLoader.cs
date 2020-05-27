@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core.Config
 {
     public abstract class ConfigurationLoader<T> : IDisposable where T : new()
     {
         private readonly string filePath;
-        private FileStream fileStream = null;
-        private readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true
-        };
+        private FileStream fileStream = null;      
 
         protected ConfigurationLoader()
         {
-            this.filePath = typeof(T).Name + ".json";
+            this.filePath = AppContext.BaseDirectory + "/" + typeof(T).Name + ".json";
         }
 
         public void Save()
@@ -31,8 +27,8 @@ namespace NeoAcheron.SystemMonitor.Core.Config
                     var value = prop.GetValue(this);
                     prop.SetValue(config, value);
                 }
-                string json = JsonSerializer.Serialize(config, SerializerOptions);
-                File.WriteAllText(filePath, json);
+                byte[] json = JsonSerializer.Serialize(config);
+                File.WriteAllBytes(filePath, json);
             }
         }
 
@@ -42,8 +38,8 @@ namespace NeoAcheron.SystemMonitor.Core.Config
             {
                 if (File.Exists(filePath))
                 {
-                    string json = File.ReadAllText(filePath);
-                    T config = JsonSerializer.Deserialize<T>(json, SerializerOptions);
+                    byte[] json = File.ReadAllBytes(filePath);
+                    T config = JsonSerializer.Deserialize<T>(json);
                     if (config != null)
                     {
                         var properties = typeof(T).GetProperties();

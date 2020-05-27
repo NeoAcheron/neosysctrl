@@ -122,16 +122,16 @@ namespace NeoAcheron.SystemMonitor.Corsair.PowerSupplies
                     Name = "Corsair/" + model;
                     break;
                 case PsuCommandCode.READ_TEMPERATURE_1:
-                    VrmTemperature.UpdateValue(this, get_float_data(data));
+                    VrmTemperature.Value = (get_float_data(data));
                     break;
                 case PsuCommandCode.READ_TEMPERATURE_2:
-                    ControllerTemperature.UpdateValue(this, get_float_data(data));
+                    ControllerTemperature.Value = (get_float_data(data));
                     break;
                 case PsuCommandCode.MFR_READ_TOTAL_POUT:
-                    PowerOut.UpdateValue(this, get_float_data(data));
+                    PowerOut.Value = (get_float_data(data));
                     break;
                 case PsuCommandCode.READ_FAN_SPEED_1:
-                    FanSpeed.UpdateValue(this, get_float_data(data));
+                    FanSpeed.Value = (get_float_data(data));
                     break;
             }
         }

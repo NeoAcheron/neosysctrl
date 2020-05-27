@@ -5,27 +5,69 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Utf8Json;
 using Utf8Json.Internal;
+using Utf8Json.Resolvers;
 
 namespace NeoAcheron.SystemMonitor.Core.Controllers
 {
-    [JsonConverter(typeof(AdjusterConverter))]
-    public abstract class Adjuster
+    [JsonFormatter(typeof(AdjusterFormatter))]
+    public interface IAdjuster
     {
-        internal string Type { get; set; }
+        [DataMember]
+        string Type { get; set; }
+        string[] WatchedMeasurementPaths { get; }
+        string[] ControlledSettingPaths { get; }
 
-        public abstract string[] WatchedMeasurementPaths { get; }
-        public abstract string[] ControlledSettingPaths { get; }
-
-        public abstract bool Start(SystemTraverser systemTraverser);
-        public abstract bool Stop();
+        bool Start(SystemTraverser systemTraverser);
+        bool Stop();
     }
 
-    public class AdjusterConverter : JsonConverter<Adjuster>
+    public sealed class AdjusterTypeContainer
     {
-        public override bool CanConvert(Type typeToConvert) => typeof(Adjuster).IsAssignableFrom(typeToConvert);
+        private static Dictionary<string, Type> supportedTypes = new Dictionary<string, Type>() {
+            { nameof(FixedAdjuster), typeof(FixedAdjuster) },
+            { nameof(LinearAdjuster), typeof(LinearAdjuster) },
+        };
+
+        public string Type { get; set; }
+
+        public Type GetAdjusterType()
+        {
+            return supportedTypes[Type];
+        }
+    }
+
+    public class AdjusterFormatter : IJsonFormatter<IAdjuster>
+    {
+        private Dictionary<string, Type> supportedTypes = new Dictionary<string, Type>() {
+            { nameof(FixedAdjuster), typeof(FixedAdjuster) },
+            { nameof(LinearAdjuster), typeof(LinearAdjuster) },
+        };
+
+
+        public IAdjuster Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            var savedReader = reader;
+            AdjusterTypeContainer data = formatterResolver.GetFormatter<AdjusterTypeContainer>().Deserialize(ref reader, formatterResolver);
+            Type type = data.GetAdjusterType();
+            if (type != null)
+            {
+                IAdjuster adjuster = (IAdjuster)JsonSerializer.NonGeneric.Deserialize(type, ref savedReader);
+                return adjuster;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void Serialize(ref JsonWriter writer, IAdjuster value, IJsonFormatterResolver formatterResolver)
+        {
+            JsonSerializer.NonGeneric.Serialize(value.GetType(), ref writer, value, formatterResolver);
+        }
+
+        /*
         public override Adjuster Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             JsonNamingPolicy namingPolicy = options.PropertyNamingPolicy;
@@ -81,8 +123,9 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
 
             return adjuster;
-        }
+        }*/
 
+        /*
         public override void Write(Utf8JsonWriter writer, Adjuster adjuster, JsonSerializerOptions options)
         {
             JsonNamingPolicy namingPolicy = options.PropertyNamingPolicy;
@@ -105,7 +148,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
             writer.WriteString(namingPolicy.ConvertName("Type"), adjuster.Type);
             writer.WriteEndObject();
-        }
+        }*/
     }
 
 }

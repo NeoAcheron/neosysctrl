@@ -12,12 +12,10 @@ namespace NeoAcheron.SystemMonitor.Core
     public class Measurement
     {
         public readonly string Path;
-        public virtual object Value => _measurementValue;
-        public string Name { get; set; }
 
         protected object _measurementValue;
 
-        public event EventHandler<Measurement> OnChange;
+        public event Action<Measurement> OnChange;
 
         public Measurement(string path)
         {
@@ -25,32 +23,18 @@ namespace NeoAcheron.SystemMonitor.Core
             _measurementValue = null;
         }
 
-        public void UpdateValue(IMeasurable changeSource, object measurementValue)
+        public object Value
         {
-            if (!Equals(measurementValue, _measurementValue))
+            get
             {
-                _measurementValue = measurementValue;
-
-                if (OnChange != null)
-                {
-                    OnChange.Invoke(changeSource, this);
-#if DEBUG
-                    Console.WriteLine($"Counting {OnChange.GetInvocationList().Length} delegations on {Path}");
-#endif
-                }
+                return _measurementValue;
             }
-        }
-
-        internal void RemoveChangeHandler(object source)
-        {
-            if (OnChange != null)
+            set
             {
-                foreach (var d in OnChange.GetInvocationList())
+                if (!Equals(value, _measurementValue))
                 {
-                    if (d.Target == source)
-                    {
-                        OnChange -= (d as EventHandler<Measurement>);
-                    }
+                    _measurementValue = value;
+                    OnChange?.Invoke(this);
                 }
             }
         }

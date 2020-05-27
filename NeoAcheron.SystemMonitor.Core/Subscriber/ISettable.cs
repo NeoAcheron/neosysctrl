@@ -8,6 +8,6 @@ namespace NeoAcheron.SystemMonitor.Core
     {
         Setting[] AllSettings { get; }
 
-        void SettingUpdate(object source, Setting setting);
+        void SettingUpdate(Setting setting);
     }
 }

@@ -8,25 +8,30 @@ namespace NeoAcheron.SystemMonitor.Core
     {
         public readonly string Path;
 
-        public dynamic SettingValue => _settingValue;
+        public dynamic Value
+        {
+            get
+            {
+                return _settingValue;
+            }
+            set
+            {
+                if (!Equals(value, _settingValue))
+                {
+                    _settingValue = value;
+                    OnChange?.Invoke(this);
+                }
+            }
+        }
 
         private dynamic _settingValue = null;
 
-        public event EventHandler<Setting> OnChange;
+        public event Action<Setting> OnChange;
 
         public Setting(string path, dynamic defaults = null)
         {
             Path = path;
             _settingValue = defaults;
-        }
-
-        public void UpdateValue(object changeSource, dynamic settingValue)
-        {
-            if (!Equals(settingValue, _settingValue))
-            {
-                _settingValue = settingValue;
-                OnChange?.Invoke(changeSource, this);
-            }
         }
     }
 }

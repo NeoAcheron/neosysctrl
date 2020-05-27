@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core.Controllers
 {
-    [JsonConverter(typeof(AdjusterConverter))]
-    public class FixedAdjuster : Adjuster
+    public class FixedAdjuster : IAdjuster
     {
         private Setting _setting = null;
         public float FixedTarget { get; set; } = 100;
         public string SettingPath { get; set; }
 
-        public override string[] WatchedMeasurementPaths => new string[] { };
-        public override string[] ControlledSettingPaths => new string[] { SettingPath };
+        public string[] WatchedMeasurementPaths => new string[] { };
+        public string[] ControlledSettingPaths => new string[] { SettingPath };
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public Setting Setting
         {
             get
@@ -34,24 +33,25 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
             }
         }
 
+        public string Type { get; set; }
 
-        private void Setting_OnChange(object sender, Setting e)
+        private void Setting_OnChange(Setting e)
         {
             if (e != null)
             {
-                e.UpdateValue(this, FixedTarget);
+                e.Value = FixedTarget;
             }
         }
 
-        public override bool Start(SystemTraverser systemTraverser)
+        public bool Start(SystemTraverser systemTraverser)
         {
             Setting = systemTraverser.AllSettings.FirstOrDefault(s => s.Path.Equals(SettingPath));
-            Setting_OnChange(this, Setting);
+            Setting_OnChange(Setting);
 
             return _setting != null;
         }
 
-        public override bool Stop()
+        public bool Stop()
         {
             Setting = null;
 

@@ -35,7 +35,7 @@ namespace NeoAcheron.SystemMonitor.Core
                         if (setting != null)
                         {
                             dynamic data = JsonSerializer.Deserialize<dynamic>(arg.ApplicationMessage.Payload);
-                            setting.UpdateValue(this, data);
+                            setting.Value = data;
                             arg.ProcessingFailed = false;
                         }
                     }

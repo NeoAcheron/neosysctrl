@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core.Controllers
 {
-    [JsonConverter(typeof(AdjusterConverter))]
-    public class DefaultAdjuster : Adjuster
+    public class DefaultAdjuster : IAdjuster
     {
-        public override string[] WatchedMeasurementPaths => new string[0];
-        public override string[] ControlledSettingPaths => new string[] { settingPath };
+        public string[] WatchedMeasurementPaths => new string[0];
+        public string[] ControlledSettingPaths => new string[] { settingPath };
+
+        public string Type { get; set; }
 
         public string settingPath;
 
-        public override bool Start(SystemTraverser systemTraverser)
+        public bool Start(SystemTraverser systemTraverser)
         {
             return true;
         }
 
-        public override bool Stop()
+        public bool Stop()
         {
             return true;
         }

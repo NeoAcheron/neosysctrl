@@ -3,6 +3,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,10 +19,9 @@ namespace NeoAcheron.SystemMonitor.Core
 {
     public class Publisher : IDisposable
     {
-        private static readonly object _lock = new object();
         private readonly IApplicationMessagePublisher mqttPublisher;
 
-        private readonly Dictionary<Measurement, bool> registeredMeasurements = new Dictionary<Measurement, bool>();
+        private readonly ConcurrentDictionary<Measurement, MqttApplicationMessage> registeredMeasurements = new ConcurrentDictionary<Measurement, MqttApplicationMessage>();
         private readonly CancellationTokenSource cancellationTokenSource;
 
         public Publisher(IApplicationMessagePublisher mqttPublisher)
@@ -32,21 +32,21 @@ namespace NeoAcheron.SystemMonitor.Core
 
         private IEnumerable<Measurement> TopicFilterToMeasurements(string mqttTopicFilter, bool publishing)
         {
-            IEnumerable<Measurement> includedMeasurements;
+            IEnumerable<Measurement> includedMeasurements = registeredMeasurements.Where(m => (m.Value != null) == publishing).Select(m => m.Key);
             if (mqttTopicFilter.EndsWith("#"))
             {
-                includedMeasurements = registeredMeasurements.Where(m => m.Value == publishing).Where(m => m.Key.Path.StartsWith(mqttTopicFilter.TrimEnd('#'))).Select(m => m.Key);
+                includedMeasurements = includedMeasurements.Where(m => m.Path.StartsWith(mqttTopicFilter.TrimEnd('#')));
             }
             else if (mqttTopicFilter.Contains("+"))
             {
                 string pattern = mqttTopicFilter.Replace("+", @"[\s\d_]+");
                 Regex rx = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                includedMeasurements = registeredMeasurements.Where(m => m.Value == publishing).Where(m => rx.IsMatch(m.Key.Path)).Select(m => m.Key);
+                includedMeasurements = includedMeasurements.Where(m => rx.IsMatch(m.Path));
             }
             else
             {
-                includedMeasurements = registeredMeasurements.Where(m => m.Value == publishing).Where(m => m.Key.Path == mqttTopicFilter).Select(m => m.Key);
+                includedMeasurements = includedMeasurements.Where(m => m.Path == mqttTopicFilter);
             }
 
             return includedMeasurements.ToArray();
@@ -54,27 +54,32 @@ namespace NeoAcheron.SystemMonitor.Core
 
         public void AddPublishFilter(string clientId, string mqttTopicFilter)
         {
-            lock (_lock)
+            var measurements = TopicFilterToMeasurements(mqttTopicFilter, false);
+            foreach (var measurement in measurements)
             {
-                var measurements = TopicFilterToMeasurements(mqttTopicFilter, false);
-                foreach (var measurement in measurements)
+                MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+                    .WithRetainFlag()
+                    .WithTopic(measurement.Path)
+                    .Build();
+
+                if (registeredMeasurements.TryUpdate(measurement, message, null))
                 {
-                    registeredMeasurements[measurement] = true;
                     measurement.OnChange += PublishUpdate;
-                    PublishUpdate(this, measurement);
+                    PublishUpdate(measurement);
                 }
             }
         }
 
         public void RemovePublishFilter(string clientId, string mqttTopicFilter)
         {
-            lock (_lock)
+            var measurements = TopicFilterToMeasurements(mqttTopicFilter, true);
+            foreach (var measurement in measurements)
             {
-                var measurements = TopicFilterToMeasurements(mqttTopicFilter, true);
-                foreach (var measurement in measurements)
+                MqttApplicationMessage message;
+                if (registeredMeasurements.TryGetValue(measurement, out message))
                 {
                     measurement.OnChange -= PublishUpdate;
-                    registeredMeasurements[measurement] = false;
+                    registeredMeasurements.TryUpdate(measurement, null, message);
                 }
             }
         }
@@ -85,47 +90,35 @@ namespace NeoAcheron.SystemMonitor.Core
             {
                 foreach (var measurement in measurable.AllMeasurements)
                 {
-                    if (!registeredMeasurements.ContainsKey(measurement))
-                    {
-                        registeredMeasurements.Add(measurement, false);
-                    }
+                    registeredMeasurements.TryAdd(measurement, null);
                 }
             }
         }
 
-        public void PublishUpdate(object sender, Measurement measurement)
+        public void PublishUpdate(Measurement measurement)
         {
-            if (measurement?.Value != null)
+            MqttApplicationMessage message;
+            if (measurement?.Value != null && registeredMeasurements.TryGetValue(measurement, out message))
             {
-                var topic = measurement.Path;
-                byte[] payload = JsonSerializer.Serialize(measurement.Value);
-
-                var message = new MqttApplicationMessageBuilder()
-                    .WithTopic(topic)
-                    .WithPayload(payload)
-                    .WithRetainFlag()
-                    .Build();
-
-                mqttPublisher.PublishAsync(message, cancellationTokenSource.Token).Wait();
+                message.Payload = JsonSerializer.Serialize(measurement.Value);
+                _ = mqttPublisher.PublishAsync(message, cancellationTokenSource.Token);
             }
         }
 
         public void DeregisterAll()
         {
-            lock (_lock)
+            var publishingMeasurments = registeredMeasurements.Where(m => m.Value != null).Select(m => m.Key).ToArray();
+            foreach (var measurement in publishingMeasurments)
             {
-                var publishingMeasurments = registeredMeasurements.Where(m => m.Value).Select(m => m.Key).ToArray();
-                foreach (var measurement in publishingMeasurments)
-                {
-                    measurement.OnChange -= PublishUpdate;
-                    registeredMeasurements[measurement] = false;
-                }
+                measurement.OnChange -= PublishUpdate;
+                registeredMeasurements.TryRemove(measurement, out _);
             }
         }
 
         public void Dispose()
         {
             DeregisterAll();
+            cancellationTokenSource.Cancel();
         }
     }
 }
