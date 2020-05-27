@@ -92,8 +92,9 @@ namespace NeoAcheron.SystemMonitor.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
+            applicationLifetime.ApplicationStopping.Register(OnShutdown);
             app.UseDefaultFiles(new DefaultFilesOptions
             {
                 DefaultFileNames = new List<string> { "index.html" }
@@ -122,6 +123,11 @@ namespace NeoAcheron.SystemMonitor.Web
             {
                 server.UseConnectionManager(systemTraverser);
             });
+        }
+
+        private void OnShutdown()
+        {
+            systemTraverser.Shutdown();
         }
     }
 }

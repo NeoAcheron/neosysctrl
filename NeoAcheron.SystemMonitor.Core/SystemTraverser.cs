@@ -173,5 +173,13 @@ namespace NeoAcheron.SystemMonitor.Core
                 setting.OnChange += SettingUpdate;
             }
         }
+
+        public void Shutdown()
+        {
+            foreach (var control in controls.Values)
+            {
+                control.SetDefault();
+            }
+        }
     }
 }
