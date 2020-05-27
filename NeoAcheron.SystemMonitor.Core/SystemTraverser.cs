@@ -23,12 +23,9 @@ namespace NeoAcheron.SystemMonitor.Core
 
         public readonly Computer computer;
         private readonly Thread thread;
-        private readonly SensorConfig config;
 
         public SystemTraverser(SensorConfig config = null)
         {
-            this.config = config ?? new SensorConfig();
-
             computer = new Computer();
             computer.HardwareAdded += HardwareAdded;
             computer.HardwareRemoved += HardwareRemoved;
@@ -111,6 +108,8 @@ namespace NeoAcheron.SystemMonitor.Core
             {
                 float value = (float)setting.Value;
                 controls[setting].SetSoftware(value);
+            } else {
+                controls[setting].SetDefault();
             }
         }
 

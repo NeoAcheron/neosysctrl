@@ -41,6 +41,8 @@
                 (valueChange)="SaveAdjuster($event)">
             </app-adjuster-linear>
         </ng-container>
+        <ng-container *ngIf="adjusterType === 'DefaultAdjuster' && SetDefault()">            
+        </ng-container>
     </div>
     <div class="p-2 bd-highlight align-bottom">
         <hr>

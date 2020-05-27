@@ -1,19 +1,23 @@
-﻿using Utf8Json;
+﻿using System.Linq;
+using Utf8Json;
 
 namespace NeoAcheron.SystemMonitor.Core.Controllers
 {
     public class DefaultAdjuster : IAdjuster
     {
         public string[] WatchedMeasurementPaths => new string[0];
-        public string[] ControlledSettingPaths => new string[] { settingPath };
+        public string[] ControlledSettingPaths => new string[] { SettingPath };
 
         public string Type { get; set; }
 
-        public string settingPath;
+        public string SettingPath { get; set; }
 
         public bool Start(SystemTraverser systemTraverser)
         {
-            return true;
+            var Setting = systemTraverser.AllSettings.FirstOrDefault(s => s.Path.Equals(SettingPath));
+            Setting.Value = null;
+
+            return Setting != null;
         }
 
         public bool Stop()

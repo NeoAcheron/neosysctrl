@@ -26,6 +26,7 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
     public sealed class AdjusterTypeContainer
     {
         private static Dictionary<string, Type> supportedTypes = new Dictionary<string, Type>() {
+            { nameof(DefaultAdjuster), typeof(DefaultAdjuster) },
             { nameof(FixedAdjuster), typeof(FixedAdjuster) },
             { nameof(LinearAdjuster), typeof(LinearAdjuster) },
         };
@@ -40,12 +41,6 @@ namespace NeoAcheron.SystemMonitor.Core.Controllers
 
     public class AdjusterFormatter : IJsonFormatter<IAdjuster>
     {
-        private Dictionary<string, Type> supportedTypes = new Dictionary<string, Type>() {
-            { nameof(FixedAdjuster), typeof(FixedAdjuster) },
-            { nameof(LinearAdjuster), typeof(LinearAdjuster) },
-        };
-
-
         public IAdjuster Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             var savedReader = reader;

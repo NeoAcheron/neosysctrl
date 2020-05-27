@@ -57,7 +57,7 @@ namespace NeoAcheron.SystemMonitor.Web.Controllers
             {
                 return Ok(new DefaultAdjuster()
                 {
-                    settingPath = controlPath
+                    SettingPath = controlPath
                 });
             }
         }

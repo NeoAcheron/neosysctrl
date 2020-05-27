@@ -58,6 +58,13 @@ export class Adjuster {
   watchedMeasurementPaths: string[];  
 }
 
+export class DefaultAdjuster extends Adjuster {
+  readonly type = "DefaultAdjuster";
+  readonly name = "System Default";
+
+  settingPath: string = "";
+}
+
 export class FixedAdjuster extends Adjuster {
   readonly type = "FixedAdjuster";
   readonly name = "Fixed";

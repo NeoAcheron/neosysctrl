@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Adjuster } from '../models';
+import { Adjuster, DefaultAdjuster } from '../models';
 import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Sensor } from '../models/sensor/sensor.service';
@@ -46,6 +46,15 @@ export class AdjusterComponent implements OnInit {
       this.adjuster = adjuster;
       this.adjusterType = adjuster.type;
     });
+  }
+
+  SetDefault(): boolean {
+    if (this.adjuster.type !== "DefaultAdjuster") {
+      this.adjuster = new DefaultAdjuster();
+      this.adjuster.settingPath = this.targetSensor.controlPath;
+      this.SaveAdjuster(this.adjuster);
+    }
+    return true;
   }
 
   SaveAdjuster(adjuster: Adjuster): void {
